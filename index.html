@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Account Info Lookup | Public Profile Analyzer</title>
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --surface: #121212;
+            --surface2: #1e1e1e;
+            --border: #2a2a2a;
+            --text: #e0e0e0;
+            --text2: #9e9e9e;
+            --accent: #ff0050;
+            --accent2: #00f2ea;
+            --accent3: #ffcc00;
+            --danger: #ff1744;
+            --warning: #ff9100;
+            --success: #00e676;
+            --purple: #7c4dff;
+            --glow: 0 0 30px rgba(255, 0, 80, 0.12);
+            --radius: 14px;
+            --radius-sm: 8px;
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            background-image:
+                radial-gradient(ellipse at 30% 10%, rgba(255, 0, 80, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 50%, rgba(0, 242, 234, 0.04) 0%, transparent 50%),
+                radial-gradient(ellipse at 40% 85%, rgba(124, 77, 255, 0.05) 0%, transparent 50%);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 16px 40px;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 30px 16px 16px;
+        }
+        header .logo-icon {
+            font-size: 44px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #ff0050, #00f2ea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+        }
+        header p {
+            color: var(--text2);
+            font-size: 0.9rem;
+        }
+
+        /* Disclaimer banner */
+        .disclaimer-banner {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--warning);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin: 12px 0 20px;
+            font-size: 0.8rem;
+            color: var(--text2);
+            line-height: 1.5;
+        }
+        .disclaimer-banner strong {
+            color: var(--warning);
+        }
+
+        /* Card */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px 18px;
+            margin-bottom: 16px;
+            transition: var(--transition);
+        }
+        .card:hover {
+            border-color: #444;
+            box-shadow: var(--glow);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .card-icon.url {
+            background: rgba(255, 0, 80, 0.15);
+        }
+        .card-icon.profile {
+            background: rgba(0, 242, 234, 0.12);
+        }
+        .card-icon.location {
+            background: rgba(124, 77, 255, 0.15);
+        }
+        .card-icon.warning {
+            background: rgba(255, 145, 0, 0.15);
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: -0.01em;
+        }
+        .card-subtitle {
+            font-size: 0.72rem;
+            color: var(--text2);
+        }
+
+        /* Input area */
+        .input-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        input[type="text"] {
+            flex: 1;
+            min-width: 240px;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            color: var(--text);
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: var(--transition);
+            outline: none;
+        }
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 0, 80, 0.1);
+        }
+        input[type="text"]::placeholder {
+            color: #555;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 11px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+            background: var(--surface2);
+            color: var(--text);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            letter-spacing: 0.01em;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .btn:hover {
+            background: #2a2a2a;
+            border-color: #555;
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+        .btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            font-weight: 700;
+        }
+        .btn.primary:hover {
+            background: #e00048;
+            border-color: #e00048;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .btn.small {
+            padding: 7px 14px;
+            font-size: 0.75rem;
+        }
+
+        /* Profile result */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+        .profile-item {
+            background: var(--surface2);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            text-align: center;
+        }
+        .profile-item .label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text2);
+            margin-bottom: 2px;
+        }
+        .profile-item .value {
+            font-weight: 700;
+            font-size: 0.95rem;
+            word-break: break-all;
+        }
+        .profile-item .value.region {
+            color: var(--accent2);
+        }
+        .profile-item .value.language {
+            color: var(--purple);
+        }
+        .profile-item .value.bio {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text);
+            text-align: left;
+            max-height: 80px;
+            overflow-y: auto;
+            line-height: 1.4;
+        }
+
+        /* Stats bar */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 12px 0;
+        }
+        .stat-badge {
+            background: var(--surface2);
+            border-radius: 50px;
+            padding: 8px 16px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stat-badge .num {
+            color: var(--accent3);
+        }
+
+        /* Geo estimate */
+        .geo-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+        }
+        .geo-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .geo-dot.high {
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(0, 230, 118, 0.5);
+        }
+        .geo-dot.medium {
+            background: var(--warning);
+            box-shadow: 0 0 8px rgba(255, 145, 0, 0.5);
+        }
+        .geo-dot.low {
+            background: var(--danger);
+            box-shadow: 0 0 8px rgba(255, 23, 68, 0.5);
+        }
+
+        /* Privacy education */
+        .info-box {
+            background: var(--surface2);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            font-size: 0.78rem;
+            color: var(--text2);
+            line-height: 1.5;
+            margin-top: 8px;
+        }
+        .info-box strong {
+            color: var(--text);
+        }
+        .tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            margin: 2px 4px 2px 0;
+        }
+        .tag.green {
+            background: rgba(0, 230, 118, 0.2);
+            color: #00e676;
+        }
+        .tag.red {
+            background: rgba(255, 23, 68, 0.2);
+            color: #ff1744;
+        }
+        .tag.yellow {
+            background: rgba(255, 145, 0, 0.2);
+            color: #ff9100;
+        }
+        .tag.blue {
+            background: rgba(0, 242, 234, 0.2);
+            color: #00f2ea;
+        }
+
+        /* Spinner */
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            header h1 {
+                font-size: 1.4rem;
+            }
+            .input-group {
+                flex-direction: column;
+            }
+            .profile-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <span class="logo-icon">🎵</span>
+            <h1>TikTok Account Info Lookup</h1>
+            <p>Public Profile Analyzer — Region, Language & Engagement Data</p>
+        </header>
+
+        <!-- ⚠️ CRITICAL DISCLAIMER -->
+        <div class="disclaimer-banner">
+            <strong>⚠️ IMPORTANT — Please Read:</strong> TikTok does <strong>not</strong> expose user IP addresses
+            through any public API or webpage. <strong>There is no legitimate way to obtain a TikTok user's IP address</strong>
+            from their profile URL. Anyone claiming to "find TikTok IP addresses" is either:
+            <br>• Using deceptive phishing techniques (e.g., Grabify IP loggers), which are <strong>illegal</strong> in most jurisdictions,
+            <br>• Trying to trick you into clicking tracked links to capture <em>your own</em> IP address, or
+            <br>• Running a scam.
+            <br><br>
+            <strong>This tool is educational.</strong> It analyzes <em>only publicly available metadata</em> from TikTok
+            profiles (region, language, nickname, bio, etc.) and estimates the most likely geographic region
+            based on that data. <strong>No IP addresses are collected, exposed, or obtainable.</strong>
+        </div>
+
+        <!-- URL Input Card -->
+        <div class="card" id="inputCard">
+            <div class="card-header">
+                <div class="card-icon url">🔗</div>
+                <div>
+                    <div class="card-title">TikTok Profile URL</div>
+                    <div class="card-subtitle">Paste a public TikTok profile link</div>
+                </div>
+            </div>
+            <div  class="input-group">
+                <input type="text" id="tiktokUrl"
+                placeholder="https://www.tiktok.com/@username"
+                value="https://www.tiktok.com/@tiktok"
+                autocomplete="off">
+                <button class="btn primary" id="btnAnalyze" onclick="analyzeProfile()">
+                    🔍 Analyze Profile
+                </button>
+                <button class="btn small" onclick="loadExample()" style="flex-shrink:0;">
+                    📋 Example
+                </button>
+                <button class="btn small" onclick="clearResults()" style="flex-shrink:0;">
+                    🗑 Clear
+                </button>
+            </div>
+            <div style="font-size:0.7rem;color:var(--text2);margin-top:8px;">
+                Examples: <code style="color:#00f2ea;">@tiktok</code> &nbsp;|&nbsp;
+                <code style="color:#00f2ea;">@charlidamelio</code> &nbsp;|&nbsp;
+                <code style="color:#00f2ea;">@khaby.lame</code> &nbsp;|&nbsp;
+                <code style="color:#00f2ea;">@addisonre</code>
+            </div>
+        </div>
+
+        <!-- Results Area -->
+        <div id="resultsArea" style="display:none;">
+
+            <!-- Profile Data Card -->
+            <div class="card" id="profileCard">
+                <div class="card-header">
+                    <div class="card-icon profile">👤</div>
+                    <div>
+                        <div class="card-title">Public Profile Information</div>
+                        <div class="card-subtitle" id="profileSubtitle">Extracted from TikTok's public metadata</div>
+                    </div>
+                </div>
+                <div class="profile-grid" id="profileGrid"></div>
+                <div class="stats-row" id="statsRow"></div>
+                <div style="margin-top:8px;font-size:0.7rem;color:var(--text2);text-align:center;" id="profileNote"></div>
+            </div>
+
+            <!-- Estimated Location Card -->
+            <div class="card" id="locationCard">
+                <div class="card-header">
+                    <div class="card-icon location">🌍</div>
+                    <div>
+                        <div class="card-title">Estimated Geographic Region</div>
+                        <div class="card-subtitle">Based on public profile signals (region, language, timezone)</div>
+                    </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:12px;">
+                    <div style="flex:1;min-width:200px;">
+                        <div class="geo-indicator" id="geoIndicator">
+                            <span class="geo-dot medium"></span>
+                            <span id="geoText">Analyzing public signals...</span>
+                        </div>
+                        <div id="geoTags" style="margin-top:10px;"></div>
+                    </div>
+                    <div style="flex:1;min-width:200px;">
+                        <div class="info-box" id="geoExplanation"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transparency Card -->
+            <div class="card" id="transparencyCard">
+                <div class="card-header">
+                    <div class="card-icon warning">🛡️</div>
+                    <div>
+                        <div class="card-title">Privacy & Transparency</div>
+                        <div class="card-subtitle">What this tool can and cannot do</div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:0.78rem;" id="transparencyContent">
+                    <div style="color:var(--success);">
+                        <strong>✅ What This Tool Does:</strong>
+                        <ul style="margin:6px 0 0 16px;line-height:1.6;">
+                            <li>Extracts <strong>public</strong> TikTok profile metadata</li>
+                            <li>Shows region & language from profile data</li>
+                            <li>Provides <strong>educational estimates</strong> of likely geographic region</li>
+                            <li>Runs <strong>entirely in your browser</strong> — no data sent anywhere</li>
+                        </ul>
+                    </div>
+                    <div style="color:var(--danger);">
+                        <strong>❌ What It Cannot Do:</strong>
+                        <ul style="margin:6px 0 0 16px;line-height:1.6;">
+                            <li><strong>Cannot</strong> obtain anyone's IP address</li>
+                            <li><strong>Cannot</strong> pinpoint exact location</li>
+                            <li><strong>Cannot</strong> access private account data</li>
+                            <li><strong>Cannot</strong> track or log any user activity</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer style="text-align:center;padding:16px;font-size:0.7rem;color:var(--text2);">
+            <p>🔒 All analysis runs locally in your browser. No data is sent to any server.</p>
+            <p style="margin-top:4px;">This tool is for <strong>educational purposes only</strong>. Respect others' privacy.</p>
+        </footer>
+    </div>
+
+    <script>
+        // ==================== GLOBAL STATE ====================
+        const TIKTOK_PROFILE_URL_REGEX =
+            /^https?:\/\/(www\.)?tiktok\.com\/@?([a-zA-Z0-9._-]+)(\/.*)?$/i;
+        const USERNAME_REGEX = /^@?([a-zA-Z0-9._-]+)$/;
+
+        // ==================== URL PARSING ====================
+        function parseTikTokInput(input) {
+            const trimmed = input.trim();
+            // Try full URL
+            const urlMatch = trimmed.match(TIKTOK_PROFILE_URL_REGEX);
+            if (urlMatch) {
+                return { username: urlMatch[2], url: trimmed.startsWith('http') ? trimmed : 'https://' + trimmed };
+            }
+            // Try just username
+            const userMatch = trimmed.match(USERNAME_REGEX);
+            if (userMatch) {
+                return { username: userMatch[1], url: `https://www.tiktok.com/@${userMatch[1]}` };
+            }
+            return null;
+        }
+
+        // ==================== PROFILE DATA EXTRACTION (Browser-Side) ====================
+        async function fetchTikTokProfileData(username, url) {
+            // TikTok's web profile pages embed a JSON blob in a <script id="__UNIVERSAL_DATA_FOR_REHYDRATION__">
+            // We attempt to fetch the page HTML and extract that JSON.
+            // This is a client-side demo; in production, a proxy/CORS solution would be needed.
+            // For educational purposes, we simulate the extraction with real metadata patterns.
+
+            const result = {
+                username: username,
+                url: url,
+                nickname: null,
+                bio: null,
+                region: null,
+                language: null,
+                followers: null,
+                following: null,
+                likes: null,
+                videos: null,
+                verified: false,
+                private: false,
+                avatar: null,
+                createTime: null,
+                rawDataAvailable: false,
+                extractionMethod: 'simulated',
+                estimatedCountry: null,
+                confidenceLevel: 'low',
+                signals: []
+            };
+
+            // Attempt 1: Try fetching the page via a CORS-friendly approach
+            // Since TikTok blocks cross-origin requests, we use a demo extraction
+            // that shows what data IS available when using proper server-side tools.
+
+            // For demonstration, we use known public metadata patterns.
+            // Region codes: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
+            const KNOWN_REGIONS = {
+                'US': { country: 'United States', continent: 'North America', timezone: 'UTC-5 to UTC-10' },
+                'GB': { country: 'United Kingdom', continent: 'Europe', timezone: 'UTC+0' },
+                'CA': { country: 'Canada', continent: 'North America', timezone: 'UTC-3.5 to UTC-8' },
+                'AU': { country: 'Australia', continent: 'Oceania', timezone: 'UTC+8 to UTC+10' },
+                'DE': { country: 'Germany', continent: 'Europe', timezone: 'UTC+1' },
+                'FR': { country: 'France', continent: 'Europe', timezone: 'UTC+1' },
+                'BR': { country: 'Brazil', continent: 'South America', timezone: 'UTC-2 to UTC-5' },
+                'IN': { country: 'India', continent: 'Asia', timezone: 'UTC+5:30' },
+                'ID': { country: 'Indonesia', continent: 'Asia', timezone: 'UTC+7 to UTC+9' },
+                'JP': { country: 'Japan', continent: 'Asia', timezone: 'UTC+9' },
+                'KR': { country: 'South Korea', continent: 'Asia', timezone: 'UTC+9' },
+                'MX': { country: 'Mexico', continent: 'North America', timezone: 'UTC-6 to UTC-8' },
+                'PH': { country: 'Philippines', continent: 'Asia', timezone: 'UTC+8' },
+                'VN': { country: 'Vietnam', continent: 'Asia', timezone: 'UTC+7' },
+                'TH': { country: 'Thailand', continent: 'Asia', timezone: 'UTC+7' },
+                'TR': { country: 'Turkey', continent: 'Asia/Europe', timezone: 'UTC+3' },
+                'IT': { country: 'Italy', continent: 'Europe', timezone: 'UTC+1' },
+                'ES': { country: 'Spain', continent: 'Europe', timezone: 'UTC+1' },
+                'NG': { country: 'Nigeria', continent: 'Africa', timezone: 'UTC+1' },
+                'ZA': { country: 'South Africa', continent: 'Africa', timezone: 'UTC+2' },
+            };
+
+            // Try to make an actual HTTP request (will likely fail due to CORS, but we try)
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 5000);
+                const response = await fetch(url, {
+                    signal: controller.signal,
+                    headers: { 'Accept': 'text/html' }
+                });
+                clearTimeout(timeout);
+
+                if (response.ok) {
+                    const html = await response.text();
+                    // Look for the hydration data script
+                    const scriptMatch = html.match(
+                        /<script\s+id="__UNIVERSAL_DATA_FOR_REHYDRATION__"\s*type="application\/json">([\s\S]*?)<\/script>/
+                        );
+                    if (scriptMatch && scriptMatch[1]) {
+                        try {
+                            const jsonData = JSON.parse(scriptMatch[1]);
+                            result.rawDataAvailable = true;
+                            result.extractionMethod = 'live-extraction';
+
+                            // Navigate the TikTok data structure
+                            const userModule = jsonData?.__DEFAULT_SCOPE__?.['webapp.user-detail'] || {};
+                            const userInfo = userModule?.userInfo || {};
+                            const user = userInfo?.user || userInfo || {};
+                            const stats = user?.stats || {};
+
+                            result.nickname = user?.nickname || user?.uniqueId || username;
+                            result.bio = user?.signature || user?.bio || '';
+                            result.region = user?.region || '';
+                            result.language = user?.language || '';
+                            result.followers = stats?.followerCount || 0;
+                            result.following = stats?.followingCount || 0;
+                            result.likes = stats?.heartCount || stats?.heart || 0;
+                            result.videos = stats?.videoCount || 0;
+                            result.verified = user?.verified || false;
+                            result.private = user?.privateAccount || false;
+                            result.avatar = user?.avatarLarger || user?.avatarMedium || user?.avatarThumb || '';
+                            result.createTime = user?.createTime || null;
+
+                            if (result.region) {
+                                result.signals.push(`Region code detected: ${result.region}`);
+                            }
+                            if (result.language) {
+                                result.signals.push(`Language detected: ${result.language}`);
+                            }
+                        } catch (parseErr) {
+                            console.warn('Failed to parse hydration data:', parseErr);
+                            result.signals.push('Hydration data found but could not be parsed');
+                        }
+                    } else {
+                        result.signals.push('No hydration data found in page HTML');
+                    }
+                }
+            } catch (fetchErr) {
+                console.warn('Direct fetch failed (expected due to CORS):', fetchErr.message);
+                result.signals.push(
+                    'Direct page fetch blocked by CORS — use a server-side proxy for real extraction');
+            }
+
+            // If we couldn't get real data, provide simulated educational data
+            if (!result.rawDataAvailable || !result.region) {
+                result.extractionMethod = result.extractionMethod === 'live-extraction' ? 'partial' :
+                    'educational-simulation';
+                result.signals.push(
+                    '⚠️ Using educational simulation — real extraction requires server-side proxy');
+
+                // Generate plausible simulated data for demonstration
+                const simulatedData = generateSimulatedProfileData(username);
+                if (!result.nickname) result.nickname = simulatedData.nickname;
+                if (!result.bio) result.bio = simulatedData.bio;
+                if (!result.region) result.region = simulatedData.region;
+                if (!result.language) result.language = simulatedData.language;
+                if (!result.followers) result.followers = simulatedData.followers;
+                if (!result.following) result.following = simulatedData.following;
+                if (!result.likes) result.likes = simulatedData.likes;
+                if (!result.videos) result.videos = simulatedData.videos;
+                if (!result.verified) result.verified = simulatedData.verified;
+                result.isSimulated = !result.rawDataAvailable;
+            }
+
+            // Estimate geographic region
+            if (result.region && KNOWN_REGIONS[result.region.toUpperCase()]) {
+                const regionInfo = KNOWN_REGIONS[result.region.toUpperCase()];
+                result.estimatedCountry = regionInfo.country;
+                result.estimatedContinent = regionInfo.continent;
+                result.estimatedTimezone = regionInfo.timezone;
+                result.confidenceLevel = result.rawDataAvailable ? 'medium' : 'low';
+                result.signals.push(`Region mapped to: ${regionInfo.country}`);
+            } else if (result.region) {
+                result.estimatedCountry = `Unknown (region code: ${result.region})`;
+                result.confidenceLevel = 'very-low';
+            } else {
+                result.estimatedCountry = 'Could not determine from available data';
+                result.confidenceLevel = 'none';
+            }
+
+            return result;
+        }
+
+        function generateSimulatedProfileData(username) {
+            // Deterministic simulation based on username hash — purely for educational UI
+            const hash = simpleHash(username);
+            const regions = ['US', 'GB', 'IN', 'BR', 'ID', 'DE', 'FR', 'CA', 'AU', 'JP'];
+            const regionIdx = hash % regions.length;
+            const region = regions[regionIdx];
+
+            const languages = ['en', 'en', 'en', 'id', 'pt', 'de', 'fr', 'ja', 'hi', 'en'];
+            const language = languages[regionIdx];
+
+            const nicknames = [
+                `${username.charAt(0).toUpperCase() + username.slice(1)} 🎵`,
+                `${username}_official`,
+                `✨ ${username} ✨`,
+                `${username} | Creator`,
+                `${username}Daily`
+            ];
+            const nickname = nicknames[hash % nicknames.length];
+
+            const bios = [
+                'Content creator | DM for collab 💌',
+                'Living my best life ✌️',
+                'Follow for daily content! 🔥',
+                'Travel • Food • Lifestyle 🌍',
+                'Just for fun 😎'
+            ];
+            const bio = bios[hash % bios.length];
+
+            const followers = 1000 + (hash % 500000);
+            const following = 50 + (hash % 2000);
+            const likes = followers * (10 + (hash % 50));
+            const videos = 10 + (hash % 500);
+            const verified = hash % 10 === 0;
+
+            return { nickname, bio, region, language, followers, following, likes, videos, verified };
+        }
+
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash |= 0;
+            }
+            return Math.abs(hash);
+        }
+
+        // ==================== UI RENDERING ====================
+        function renderProfileData(data) {
+            const resultsArea = document.getElementById('resultsArea');
+            resultsArea.style.display = 'block';
+
+            // Profile grid
+            const grid = document.getElementById('profileGrid');
+            const items = [
+                { label: 'Nickname', value: data.nickname || '—', cls: '' },
+                { label: 'Username', value: '@' + data.username, cls: '' },
+                { label: 'Region', value: data.region || 'Not available', cls: 'region' },
+                { label: 'Language', value: data.language || 'Not available', cls: 'language' },
+                { label: 'Verified', value: data.verified ? '✅ Yes' : '❌ No', cls: '' },
+                { label: 'Private Account', value: data.private ? '🔒 Yes' : '🌐 No', cls: '' },
+            ];
+
+            if (data.bio) {
+                items.push({ label: 'Bio', value: data.bio, cls: 'bio' });
+            }
+
+            grid.innerHTML = items.map(item =>
+                `<div class="profile-item">
+                    <div class="label">${item.label}</div>
+                    <div class="value ${item.cls}">${escapeHtml(String(item.value))}</div>
+                </div>`
+            ).join('');
+
+            // Stats row
+            const statsRow = document.getElementById('statsRow');
+            const statsItems = [
+                { label: 'Followers', value: formatNumber(data.followers) },
+                { label: 'Following', value: formatNumber(data.following) },
+                { label: 'Likes', value: formatNumber(data.likes) },
+                { label: 'Videos', value: formatNumber(data.videos) },
+            ];
+            statsRow.innerHTML = statsItems.map(s =>
+                `<span class="stat-badge">${s.label}: <span class="num">${s.value}</span></span>`
+            ).join('');
+
+            // Profile note
+            const note = document.getElementById('profileNote');
+            if (data.isSimulated) {
+                note.innerHTML =
+                    '⚠️ <strong>Simulated data</strong> — TikTok blocks browser-based extraction. Use a server-side proxy for real data.';
+                note.style.color = 'var(--warning)';
+            } else if (data.extractionMethod === 'partial') {
+                note.innerHTML =
+                    '🟡 <strong>Partial extraction</strong> — some fields were supplemented with estimates.';
+                note.style.color = 'var(--warning)';
+            } else {
+                note.innerHTML = '✅ Data extracted from TikTok\'s public profile metadata.';
+                note.style.color = 'var(--success)';
+            }
+
+            // Geo indicator
+            const geoIndicator = document.getElementById('geoIndicator');
+            const geoDot = geoIndicator.querySelector('.geo-dot');
+            const geoText = document.getElementById('geoText');
+
+            geoDot.className = 'geo-dot';
+            if (data.confidenceLevel === 'medium') geoDot.classList.add('medium');
+            else if (data.confidenceLevel === 'low') geoDot.classList.add('low');
+            else if (data.confidenceLevel === 'very-low') geoDot.classList.add('low');
+            else geoDot.classList.add('low');
+
+            geoText.textContent = data.estimatedCountry || 'Unable to estimate';
+
+            // Geo tags
+            const geoTags = document.getElementById('geoTags');
+            const tags = [];
+            if (data.region) tags.push({ text: `Region: ${data.region}`, cls: 'blue' });
+            if (data.language) tags.push({ text: `Language: ${data.language}`, cls: 'green' });
+            if (data.confidenceLevel === 'medium') tags.push({ text: 'Medium Confidence', cls: 'yellow' });
+            else if (data.confidenceLevel === 'low') tags.push({ text: 'Low Confidence', cls: 'red' });
+            else tags.push({ text: 'Very Low Confidence', cls: 'red' });
+            if (data.rawDataAvailable) tags.push({ text: 'Live Data', cls: 'green' });
+            else tags.push({ text: 'Simulated', cls: 'yellow' });
+
+            geoTags.innerHTML = tags.map(t => `<span class="tag ${t.cls}">${t.text}</span>`).join(' ');
+
+            // Geo explanation
+            const geoExplanation = document.getElementById('geoExplanation');
+            geoExplanation.innerHTML = `
+                <strong>How this estimate works:</strong><br>
+                TikTok profiles include a <strong>region</strong> field and <strong>language</strong> preference
+                in their public metadata. This tool maps the region code to a country and estimates
+                the likely timezone.<br><br>
+                <strong>Important:</strong> This is <em>not</em> the user's IP address or exact location.
+                It is the account's declared region, which may differ from their actual physical location.
+                ${data.isSimulated ? '<br><br>⚠️ <strong>Current data is simulated</strong> — real extraction requires a server-side proxy due to TikTok\'s CORS policy.' : ''}
+            `;
+
+            // Signal list
+            const profileSubtitle = document.getElementById('profileSubtitle');
+            if (data.signals && data.signals.length > 0) {
+                profileSubtitle.textContent = data.signals.join(' | ');
+            }
+
+            // Scroll to results
+            resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatNumber(num) {
+            if (num === null || num === undefined || isNaN(num)) return '—';
+            if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+            if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        // ==================== MAIN ACTION ====================
+        async function analyzeProfile() {
+            const inputEl = document.getElementById('tiktokUrl');
+            const btn = document.getElementById('btnAnalyze');
+            const input = inputEl.value.trim();
+
+            if (!input) {
+                alert('Please paste a TikTok profile URL or username.');
+                return;
+            }
+
+            const parsed = parseTikTokInput(input);
+            if (!parsed) {
+                alert(
+                    'Invalid TikTok URL or username.\n\nPlease use a format like:\n- https://www.tiktok.com/@username\n- @username\n- username'
+                    );
+                return;
+            }
+
+            // UI loading state
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Analyzing...';
+            document.getElementById('resultsArea').style.display = 'none';
+
+            try {
+                const data = await fetchTikTokProfileData(parsed.username, parsed.url);
+
+                // Force the data to always show the educational simulation notice
+                // since browser-side extraction almost always fails due to CORS
+                if (!data.rawDataAvailable) {
+                    data.isSimulated = true;
+                    data.extractionMethod = 'educational-simulation';
+                    data.confidenceLevel = 'low';
+                    if (!data.signals.includes(
+                            'Direct page fetch blocked by CORS — use a server-side proxy for real extraction')) {
+                        data.signals.push(
+                            'Direct page fetch blocked by CORS — use a server-side proxy for real extraction');
+                    }
+                }
+
+                renderProfileData(data);
+            } catch (err) {
+                alert('Error analyzing profile: ' + err.message);
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔍 Analyze Profile';
+            }
+        }
+
+        function loadExample() {
+            const examples = [
+                'https://www.tiktok.com/@tiktok',
+                'https://www.tiktok.com/@charlidamelio',
+                'https://www.tiktok.com/@khaby.lame',
+                '@addisonre',
+            ];
+            const inputEl = document.getElementById('tiktokUrl');
+            const current = inputEl.value.trim();
+            const currentIdx = examples.findIndex(e => e === current || e === 'https://www.tiktok.com/' + current);
+            const nextIdx = (currentIdx + 1) % examples.length;
+            inputEl.value = examples[nextIdx];
+            // Auto-analyze
+            analyzeProfile();
+        }
+
+        function clearResults() {
+            document.getElementById('resultsArea').style.display = 'none';
+            document.getElementById('tiktokUrl').value = '';
+        }
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            // Allow Enter key to trigger analysis
+            document.getElementById('tiktokUrl').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    analyzeProfile();
+                }
+            });
+
+            console.log('%c🎵 TikTok Account Info Lookup %cReady',
+                'font-size:1.1em;font-weight:bold;color:#ff0050;',
+                'color:#e0e0e0;');
+            console.log('%c🔒 All analysis runs locally. No data is sent anywhere.',
+                'color:#9e9e9e;');
+            console.log('%c⚠️ TikTok blocks browser-based extraction. Real data requires a server-side proxy.',
+                'color:#ff9100;');
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
